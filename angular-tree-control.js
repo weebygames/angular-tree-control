@@ -51,16 +51,30 @@
                         };
                     };
 
+                    var trimSlashes = function(s) {
+                        var i;
+                        while ((i = s.indexOf('/')) === 0  && s.length) {
+                            s = s.substring(i + 1, s.length);
+                        }
+                        while ((i =  s.lastIndexOf('/')) === s.length - 1 && s.length) {
+                            s = s.substring(0, i);
+                        }
+                        return s;
+                    }
+
                     $scope.treeFunctions.addToTree = function(initialPath, parentNode, currentPathIndex) {
                         parentNode = parentNode || $scope.treeModel;
                         currentPathIndex = currentPathIndex || 0;
 
+                        initialPath = trimSlashes(initialPath);
+
                         var currentPath = initialPath.substring(currentPathIndex, initialPath.length);
+                        currentPath = currentPath;
                         var lastSlash = currentPath.lastIndexOf('/');
                         if (lastSlash < 0) {
                             // Final case
                             var obj = {
-                                name: currentPath,
+                                name: currentPath || initialPath,
                                 path: initialPath,
                                 children: [],
                                 _editable: false,
@@ -87,7 +101,7 @@
                             return obj;
                         } else {
                             // Recursive case
-                            var firstSlash = initialPath.substring(currentPathIndex).indexOf('/');
+                            var firstSlash = currentPathIndex + initialPath.substring(currentPathIndex).indexOf('/');
                             var nextParentName = initialPath.substring(currentPathIndex, firstSlash);
 
                             // Make sure the next directory down exists
@@ -213,6 +227,33 @@
                             if ($scope.onSelection)
                                 $scope.onSelection({node: $scope.selectedNode});
                         }
+                    };
+
+                    // Scan down tree and make sure that everything is expanded
+                    $scope.treeFunctions.selectNodeLabel = function(nodeName, parentNode, chain) {
+                        parentNode = parentNode || $scope.treeModel;
+                        var topLevel = chain === undefined;
+                        chain = chain || [];
+                        for (var i = 0; i < parentNode.children.length; ++i) {
+                            var testNode = parentNode.children[i];
+                            if (testNode.path == nodeName) {
+                                // FOUND IT
+                                chain.push(testNode);
+                                return true;
+                            }
+                            if ($scope.treeFunctions.selectNodeLabel(nodeName, testNode, chain)) {
+                                // Select self
+                                chain.push(testNode);
+                                if (topLevel && chain.length) {
+                                    for (var i = chain.length - 1; i >= 0; i--) {
+                                        $scope.selectNodeHead(chain[i]);
+                                        $scope.selectNodeLabel(chain[i]);
+                                    }
+                                }
+                                return true;
+                            }
+                        }
+                        return false;
                     };
 
                     $scope.selectedClass = function() {
