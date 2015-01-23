@@ -120,7 +120,7 @@
                                     currentPathIndex);
                             }
 
-                            $scope.treeFunctions.addToTree(
+                            return $scope.treeFunctions.addToTree(
                                 initialPath,
                                 nextParent,
                                 firstSlash + 1);
