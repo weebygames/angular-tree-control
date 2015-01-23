@@ -169,7 +169,7 @@
                 compile: function(element, attrs, childTranscludeFn) {
                     return function ( scope, element, attrs, treemodelCntr ) {
 
-                        scope.$watch("treeModel", function updateNodeOnRootScope(newValue) {
+                        scope.$watch("treeModel", function updateNodeOnRootScope(newValue, oldValue) {
                             if (angular.isArray(newValue)) {
                                 if (angular.isDefined(scope.node) && angular.equals(scope.node[scope.options.nodeChildren], newValue))
                                     return;
@@ -276,5 +276,39 @@
                     });
                 }
             }
+        })
+        .directive('ngEditableNode', function () {
+          return {
+            restrict: 'E',
+            scope: {
+              ngModel: '='
+            },
+            link: function (scope, element, attrs) {
+              var doRename = function(useNewValue) {
+                scope.$apply(function (){
+                  event.target.innerHTML = scope.ngModel._rename(useNewValue ? event.target.innerHTML : undefined);
+                });
+              };
+
+              element.bind('blur', function() {
+                doRename(true);
+              });
+
+              element.bind("keydown keypress", function (event) {
+                if(event.which === 13) {
+                  doRename(true);
+                  event.preventDefault();
+                }
+              });
+
+              element.bind("keydown keypress", function (event) {
+                if(event.which === 27) {
+                  doRename(false);
+                  event.preventDefault();
+                }
+              });
+            }
+          }
         });
+
 })( angular );
