@@ -33,6 +33,7 @@
                     expandedNodes: "=?",
                     onSelection: "&",
                     onNodeToggle: "&",
+                    treeFunctions: "=",
                     options: "=?",
                     orderBy: "@",
                     reverseOrder: "@",
@@ -41,6 +42,76 @@
                     contextMenuNode: "="
                 },
                 controller: ['$scope', function( $scope ) {
+                    $scope.treeFunctions = $scope.treeFunctions || {};
+
+                    $scope.treeFunctions.reset = function(treeName) {
+                        $scope.treeModel = {
+                            name: treeName,
+                            children: []
+                        };
+                    };
+
+                    $scope.treeFunctions.addToTree = function(initialPath, parentNode, currentPathIndex) {
+                        parentNode = parentNode || $scope.treeModel;
+                        currentPathIndex = currentPathIndex || 0;
+
+                        var currentPath = initialPath.substring(currentPathIndex, initialPath.length);
+                        var lastSlash = currentPath.lastIndexOf('/');
+                        if (lastSlash < 0) {
+                            // Final case
+                            var obj = {
+                                name: currentPath,
+                                path: initialPath,
+                                children: [],
+                                _editable: false,
+                                _oldName: '',
+                                _setEditable: function(flag) {
+                                    if (flag) {
+                                        obj._oldName = obj.name;
+                                    }
+                                    obj._editable = flag;
+                                    obj._setEditableCallback && obj._setEditableCallback();
+                                },
+                                _setEditableCallback: null,
+                                _rename: function(newName) {
+                                    if (!newName || !newName.length) {
+                                        obj.name = obj._oldName;
+                                    } else {
+                                        obj.name = newName;
+                                    }
+                                    obj._setEditable(false);
+                                    return obj.name;
+                                }
+                            };
+                            parentNode.children.push(obj);
+                            return obj;
+                        } else {
+                            // Recursive case
+                            var firstSlash = initialPath.substring(currentPathIndex).indexOf('/');
+                            var nextParentName = initialPath.substring(currentPathIndex, firstSlash);
+
+                            // Make sure the next directory down exists
+                            var nextParent = null;
+                            for (var i = 0; i < parentNode.children.length; ++i) {
+                                var nextParentTest = parentNode.children[i];
+                                if (nextParentTest.name == nextParentName) {
+                                    nextParent = nextParentTest;
+                                    break;
+                                }
+                            }
+                            if (!nextParent) {
+                                nextParent = $scope.treeFunctions.addToTree(
+                                    initialPath.substring(0, firstSlash),
+                                    parentNode,
+                                    currentPathIndex);
+                            }
+
+                            $scope.treeFunctions.addToTree(
+                                initialPath,
+                                nextParent,
+                                firstSlash + 1);
+                        }
+                    };
 
                     function defaultIsLeaf(node) {
                         return !node[$scope.options.nodeChildren] || node[$scope.options.nodeChildren].length === 0;
@@ -157,9 +228,9 @@
                     var template =
                         '<ul '+classIfDefined($scope.options.injectClasses.ul, true)+'>' +
                             '<li context-menu="contextMenuShow(node)" data-target="menu-test" ng-repeat="node in node.' + $scope.options.nodeChildren + ' | filter:filterExpression:filterComparator | orderBy:orderBy:reverseOrder" ng-class="headClass(node)" '+classIfDefined($scope.options.injectClasses.li, true)+'>' +
-                            '<i class="tree-branch-head" ng-class="iBranchClass()" ng-click="selectNodeHead(node)"></i>' +
+                            '<i class="tree-branch-head" ng-class="iBranchClass()" ng-click="!node._editable && selectNodeHead(node)"></i>' +
                             '<i class="tree-leaf-head '+classIfDefined($scope.options.injectClasses.iLeaf, false)+'"></i>' +
-                            '<div class="tree-label '+classIfDefined($scope.options.injectClasses.label, false)+'" ng-class="selectedClass()" ng-click="selectNodeLabel(node)" tree-transclude></div>' +
+                            '<div class="tree-label '+classIfDefined($scope.options.injectClasses.label, false)+'" ng-class="selectedClass()" ng-click="!node._editable && selectNodeLabel(node)" tree-transclude></div>' +
                             '<treeitem ng-if="nodeExpanded()"></treeitem>' +
                             '</li>' +
                             '</ul>';
@@ -277,16 +348,24 @@
                 }
             }
         })
-        .directive('ngEditableNode', function () {
+        .directive('editableTreeNode', function ($timeout) {
           return {
             restrict: 'E',
             scope: {
               ngModel: '='
             },
             link: function (scope, element, attrs) {
+              // Add callbacks to the node
+              var node = scope.ngModel;
+              var target = element[0];
+
+              node._setEditableCallback = function() {
+                $timeout(function(){ target.focus(); });
+              };
+
               var doRename = function(useNewValue) {
                 scope.$apply(function (){
-                  event.target.innerHTML = scope.ngModel._rename(useNewValue ? event.target.innerHTML : undefined);
+                  target.innerHTML = scope.ngModel._rename(useNewValue ? target.innerHTML : undefined);
                 });
               };
 
@@ -310,5 +389,4 @@
             }
           }
         });
-
 })( angular );

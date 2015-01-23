@@ -99,6 +99,41 @@ $scope.dataForTheTree =
 ];
 ```
 
+## For use as a file tree
+```
+<!-- Notice the last two attributes and the editable-tree-node -->
+<treecontrol id="fileTreeID"
+  class="tree-classic"
+  tree-model="fileTreeModel"
+  options="treeOptions"
+  on-selection="showSelected(node)"
+  selected-node="fileTreeSelectedNode"
+  expanded-nodes="fileTreeExpandedNodes"
+  context-menu-node="contextMenuNode"
+  tree-functions="treeFunctions">
+    <editable-tree-node contenteditable="{{!!node._editable}}" ng-class="{editable: node._editable}" ng-model="node">{{node.name}}</editable-tree-node>
+</treecontrol>
+<!-- Context menu for the tree -->
+<div
+  class="dropdown position-fixed" id="menu-test"
+  ng-class="{ 'highlight': highlight, 'expanded': expanded }">
+  <ul class="dropdown-menu" role="menu">
+    <li ng-if="contextMenuNode.children && contextMenuNode.children.length">
+    <a class="pointer" role="menuitem" tabindex="1" ng-click="menuAddDir(node.path)">Add directory</a>
+    </li>
+    <li ng-if="contextMenuNode.children && contextMenuNode.children.length">
+    <a class="pointer" role="menuitem" tabindex="2" ng-click="menuAddFile()">Add file</a>
+    </li>
+    <li>
+      <a class="pointer" role="menuitem" tabindex="3" ng-click="menuRenameFile()">Rename</a>
+    </li>
+    <li ng-if="!contextMenuNode.children || !contextMenuNode.children.length">
+      <a class="pointer" role="menuitem" tabindex="4" ng-click="menuDeleteFile()">Delete file</a>
+    </li>
+  </ul>
+</div>
+```
+
 
 ## Usage
 

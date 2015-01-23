@@ -107,3 +107,9 @@ treecontrol.tree-dark li .tree-selected {
 treecontrol.tree-dark {
     color: #ddd;
 }
+
+editable-tree-node.editable {
+  border: 1px solid #333;
+  overflow: visible;
+  padding: 0 4px 0 4px;
+}
