@@ -39,7 +39,8 @@
                     reverseOrder: "@",
                     filterExpression: "=?",
                     filterComparator: "=?",
-                    contextMenuNode: "="
+                    contextMenuNode: "=",
+                    nodeRenameCallback: "="
                 },
                 controller: ['$scope', function( $scope ) {
                     function defaultIsLeaf(node) {
@@ -244,6 +245,8 @@
                                             // Need to update path with new name
                                             var lastSlash = obj.path.lastIndexOf('/');
                                             obj.path = obj.path.substring(0, lastSlash) + obj.name;
+
+                                            $scope.nodeRenameCallback && $scope.nodeRenameCallback(obj, obj._oldName);
                                         }
                                         obj._setEditable(false);
                                         return obj.name;
