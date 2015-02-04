@@ -244,7 +244,12 @@
 
                                             // Need to update path with new name
                                             var lastSlash = obj.path.lastIndexOf('/');
-                                            obj.path = obj.path.substring(0, lastSlash) + obj.name;
+                                            if (lastSlash >= 0) {
+                                                obj.path = obj.path.substring(0, lastSlash) + '/' + obj.name
+                                            } else {
+                                                // No slashes found, must be a top-level node.
+                                                obj.path = obj.name;
+                                            }
 
                                             $scope.nodeRenameCallback && $scope.nodeRenameCallback(obj, obj._oldName);
                                         }
