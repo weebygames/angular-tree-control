@@ -240,6 +240,10 @@
                                             obj.name = obj._oldName;
                                         } else {
                                             obj.name = newName;
+
+                                            // Need to update path with new name
+                                            var lastSlash = obj.path.lastIndexOf('/');
+                                            obj.path = obj.path.substring(0, lastSlash) + obj.name;
                                         }
                                         obj._setEditable(false);
                                         return obj.name;
