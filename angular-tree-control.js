@@ -252,7 +252,7 @@
                                                 obj.path = obj.name;
                                             }
 
-                                            $scope.nodeRenameCallback && $scope.nodeRenameCallback(obj, old_path);
+                                            scope.nodeRenameCallback && scope.nodeRenameCallback(obj, old_path);
                                         }
                                         obj._setEditable(false);
                                         return obj.name;
