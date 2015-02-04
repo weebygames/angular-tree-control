@@ -244,6 +244,7 @@
 
                                             // Need to update path with new name
                                             var lastSlash = obj.path.lastIndexOf('/');
+                                            var old_path = obj.path;
                                             if (lastSlash >= 0) {
                                                 obj.path = obj.path.substring(0, lastSlash) + '/' + obj.name
                                             } else {
@@ -251,7 +252,7 @@
                                                 obj.path = obj.name;
                                             }
 
-                                            $scope.nodeRenameCallback && $scope.nodeRenameCallback(obj, obj._oldName);
+                                            $scope.nodeRenameCallback && $scope.nodeRenameCallback(obj, old_path);
                                         }
                                         obj._setEditable(false);
                                         return obj.name;
