@@ -282,7 +282,7 @@
                             if (prefix !== '') {
                                 console.log('deleting node name', nodeName);
                                 console.log('from prefix', prefix);
-                                parent = this.findParent(initialPath);
+                                parent = findParent(initialPath);
                             } else {
                                 // No path, must be top-level node
                                 console.log('from root, deleting node name', nodeName);
