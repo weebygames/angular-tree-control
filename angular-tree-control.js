@@ -44,7 +44,7 @@
                 },
                 controller: ['$scope', function( $scope ) {
                     function defaultIsLeaf(node) {
-                        return !node[$scope.options.nodeChildren] || node[$scope.options.nodeChildren].length === 0;
+                        return node._isLeaf;
                     }
 
                     function defaultEquality(a, b) {
@@ -211,7 +211,7 @@
                             return s;
                         }
 
-                        var addNode = function(root, initialPath) {
+                        var addNode = function(root, initialPath, isLeaf) {
                             var nodeName = extractName(initialPath);
                             var obj = {
                                 name: nodeName,
@@ -219,6 +219,7 @@
                                 children: [],
                                 _editable: false,
                                 _oldName: '',
+                                _isLeaf: isLeaf,
                                 _setEditable: function(flag) {
                                     if (flag) {
                                         obj._oldName = obj.name;
@@ -282,7 +283,7 @@
                                 if (!nextParent) {
                                     var tempPath = initialPath.substring(0, firstSlash);
                                     console.log('Next parent does not exist, adding:', tempPath, parentNode);
-                                    nextParent = addNode(parentNode, tempPath);
+                                    nextParent = addNode(parentNode, tempPath, false);
                                 }
 
                                 return findParent(
@@ -340,7 +341,7 @@
                         scope.treeFunctions.addToTree = function(initialPath) {
                             var parentNode = findParent(initialPath);
                             var nodeName = extractName(initialPath);
-                            return addNode(parentNode, initialPath);
+                            return addNode(parentNode, initialPath, true);
                         };
 
                         scope.$watch("treeModel", function updateNodeOnRootScope(newValue, oldValue) {
