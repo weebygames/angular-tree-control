@@ -252,21 +252,40 @@
                             }
                         }
 
-                        scope.treeFunctions.deleteFromTree = function(initialPath) {
-
+                        var extractName = function(initialPath) {
                             var lastSlash = initialPath.lastIndexOf('/');
                             var nodeName = initialPath;
-                            var prefix = '';
-                            var parent = null;
 
                             if (lastSlash >= 0) {
                                 nodeName = initialPath.substring(lastSlash+1);
+                            }
+
+                            return nodeName;
+                        }
+
+                        var extractPrefix = function(initialPath) {
+                            var lastSlash = initialPath.lastIndexOf('/');
+                            var prefix = '';
+
+                            if (lastSlash >= 0) {
                                 prefix = initialPath.substring(0, lastSlash+1);
+                            }
+                            return prefix;
+                        }
+
+                        scope.treeFunctions.deleteFromTree = function(initialPath) {
+
+                            var nodeName = extractName(initialPath);
+                            var prefix = extractPrefix(initialPath);
+                            var parent = null;
+
+                            if (prefix !== '') {
                                 console.log('deleting node name', nodeName);
                                 console.log('from prefix', prefix);
                                 parent = findParent(initialPath);
                             } else {
                                 // No path, must be top-level node
+                                console.log('from root, deleting node name', nodeName);
                                 parent = scope.treeModel;
                             }
 
@@ -280,8 +299,9 @@
 
                         scope.treeFunctions.addToTree = function(initialPath) {
                             var parentNode = findParent(initialPath);
+                            var nodeName = extractName(initialPath);
                             var obj = {
-                                name: currentPath || initialPath,
+                                name: nodeName,
                                 path: initialPath,
                                 children: [],
                                 _editable: false,
