@@ -75,15 +75,6 @@
 
           function filterTree() {
             var qry = $scope.searchString;
-            console.log('filtering on', qry);
-
-            if (qry === '') {
-              // clear 'hidden' flags
-              breadthFirst($scope.treeModel, function(node) {
-                node._hidden = false;
-              });
-              return;
-            }
 
             if (qry !== undefined && typeof qry === 'string') {
               filterTreeR($scope.treeModel, qry);
@@ -122,6 +113,7 @@
           ensureDefault($scope.options, "injectClasses", {});
           ensureDefault($scope.options.injectClasses, "ul", "");
           ensureDefault($scope.options.injectClasses, "li", "");
+          ensureDefault($scope.options.injectClasses, "liHidden", "hidden");
           ensureDefault($scope.options.injectClasses, "liSelected", "");
           ensureDefault($scope.options.injectClasses, "iExpanded", "");
           ensureDefault($scope.options.injectClasses, "iCollapsed", "");
@@ -139,14 +131,31 @@
           }
           $scope.parentScopeOfTree = $scope.$parent;
 
+          $scope.liHiddenClass = function(node) {
+            var liHiddenClass = classIfDefined(
+              $scope.options.injectClasses.liHidden,
+              false
+            );
+
+            if ($scope.options.isHidden(node)) {
+              return liHiddenClass;
+            }
+
+            return '';
+          };
+
           $scope.headClass = function(node) {
             var liSelectionClass = classIfDefined($scope.options.injectClasses.liSelected, false);
             var injectSelectionClass = "";
+
+            var hiddenClass = $scope.liHiddenClass(node);
+
+            if(hiddenClass !== '') {
+              return hiddenClass; // If it's hidden, nothing else matters
+            }
+
             if (liSelectionClass && ($scope.options.equality(this.node, $scope.selectedNode)))
               injectSelectionClass = " " + liSelectionClass;
-            if ($scope.options.isHidden(node)) {
-              injectSelectionClass = "hidden " + injectSelectionClass;
-            }
             if ($scope.options.isLeaf(node))
               return "tree-leaf" + injectSelectionClass;
             if ($scope.expandedNodesMap[this.$id])
@@ -242,13 +251,20 @@
           //tree template
           var template =
             '<ul '+classIfDefined($scope.options.injectClasses.ul, true)+'>' +
-              '<li context-menu="contextMenuShow(node)" data-target="menu-test" ng-repeat="node in node.' + $scope.options.nodeChildren + ' | filter:filterExpression:filterComparator | orderBy:orderBy:reverseOrder" ng-class="headClass(node)" '+classIfDefined($scope.options.injectClasses.li, true)+'>' +
-              '<i class="tree-branch-head" ng-class="iBranchClass()" ng-click="!node._editable && selectNodeHead(node)"></i>' +
-              '<i class="tree-leaf-head '+classIfDefined($scope.options.injectClasses.iLeaf, false)+'"></i>' +
-              '<div class="tree-label '+classIfDefined($scope.options.injectClasses.label, false)+'" ng-class="selectedClass()" ng-click="!node._editable && selectNodeLabel(node)" tree-transclude></div>' +
-              '<treeitem ng-if="nodeExpanded()"></treeitem>' +
+              '<li context-menu="contextMenuShow(node)" '
+                + 'data-target="menu-test" '
+                + 'ng-repeat="node in node.' + $scope.options.nodeChildren
+                + ' | filter:filterExpression:filterComparator'
+                + ' | orderBy:orderBy:reverseOrder" '
+                + 'ng-class="headClass(node)" '
+                + classIfDefined($scope.options.injectClasses.li, true)
+                +'>' +
+                '<i class="tree-branch-head" ng-class="iBranchClass()" ng-click="!node._editable && selectNodeHead(node)"></i>' +
+                '<i class="tree-leaf-head '+classIfDefined($scope.options.injectClasses.iLeaf, false)+'"></i>' +
+                '<div class="tree-label '+classIfDefined($scope.options.injectClasses.label, false)+'" ng-class="selectedClass()" ng-click="!node._editable && selectNodeLabel(node)" tree-transclude></div>' +
+                '<treeitem ng-if="nodeExpanded()"></treeitem>' +
               '</li>' +
-              '</ul>';
+            '</ul>';
 
           this.template = $compile(template);
         }],
