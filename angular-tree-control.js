@@ -337,6 +337,7 @@
                                 }
                             };
                             parentNode.children.push(obj);
+                            return obj;
                         };
 
                         scope.$watch("treeModel", function updateNodeOnRootScope(newValue, oldValue) {
