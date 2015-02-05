@@ -341,6 +341,17 @@
                         scope.treeFunctions.addToTree = function(initialPath, isLeaf) {
                             var parentNode = findParent(initialPath);
                             var nodeName = extractName(initialPath);
+
+                            var found = false;
+                            for (var i = 0; i < scope.expandedNodes.length; ++i) {
+                                if (scope.expandedNodes[i] === parentNode) {
+                                    found = true;
+                                }
+                            }
+                            if (!found) {
+                                scope.expandedNodes.push(parentNode);
+                            }
+
                             return addNode(parentNode, initialPath, isLeaf);
                         };
 
