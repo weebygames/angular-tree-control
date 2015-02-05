@@ -239,13 +239,13 @@
                                 }
                                 if (!nextParent) {
                                     console.log('Next parent does not exist, adding:', initialPath.substring(0, firstSlash), parentNode);
-                                    nextParent = scope.treeFunctions.addToTree(
+                                    nextParent = scope.treeFunctions.findParent(
                                         initialPath.substring(0, firstSlash),
                                         parentNode,
                                         currentPathIndex);
                                 }
 
-                                return scope.treeFunctions.addToTree(
+                                return scope.treeFunctions.findParent(
                                     initialPath,
                                     nextParent,
                                     firstSlash + 1);
