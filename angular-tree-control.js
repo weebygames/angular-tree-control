@@ -338,10 +338,10 @@
                             }
                         }
 
-                        scope.treeFunctions.addToTree = function(initialPath) {
+                        scope.treeFunctions.addToTree = function(initialPath, isLeaf) {
                             var parentNode = findParent(initialPath);
                             var nodeName = extractName(initialPath);
-                            return addNode(parentNode, initialPath, true);
+                            return addNode(parentNode, initialPath, isLeaf);
                         };
 
                         scope.$watch("treeModel", function updateNodeOnRootScope(newValue, oldValue) {
