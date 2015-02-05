@@ -107,3 +107,7 @@
 [treecontrol].tree-dark {
     color: #ddd;
 }
+
+[treecontrol].hidden {
+    display: none;
+}

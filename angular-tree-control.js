@@ -29,6 +29,7 @@
         transclude: true,
         scope: {
           treeModel: "=",
+          searchString: '=',
           selectedNode: "=?",
           expandedNodes: "=?",
           onSelection: "&",
@@ -43,8 +44,62 @@
           nodeRenameCallback: "="
         },
         controller: ['$scope', function( $scope ) {
+
+          // Hides all nodes who don't have 'qry' in their names
+          // (or in one of their children)
+          // If qry is '', sets everything to visible.
+          function filterTreeR(node, qry) {
+            if (!node) {
+              return false;
+            }
+
+            var showKid = false;
+
+            if (node.children && node.children.length > 0) {
+              for (var i = 0; i < node.children.length; ++i) {
+                if (filterTreeR(node.children[i], qry)) {
+                  showKid = true;
+                }
+              }
+            }
+
+            if (qry === '' || showKid || node.name.indexOf(qry) > -1) {
+              node._isHidden = false;
+            }
+            else {
+              node._isHidden = true;
+            }
+
+            return !node._isHidden;
+          }
+
+          function filterTree() {
+            var qry = $scope.searchString;
+            console.log('filtering on', qry);
+
+            if (qry === '') {
+              // clear 'hidden' flags
+              breadthFirst($scope.treeModel, function(node) {
+                node._hidden = false;
+              });
+              return;
+            }
+
+            if (qry !== undefined && typeof qry === 'string') {
+              filterTreeR($scope.treeModel, qry);
+            }
+          }
+
+          $scope.$watch('searchString', function() {
+            filterTree();
+          });
+
           function defaultIsLeaf(node) {
             return node._isLeaf;
+          }
+
+          function defaultIsHidden(node) {
+            return node._isHidden;
           }
 
           function defaultEquality(a, b) {
@@ -75,6 +130,7 @@
           ensureDefault($scope.options.injectClasses, "labelSelected", "");
           ensureDefault($scope.options, "equality", defaultEquality);
           ensureDefault($scope.options, "isLeaf", defaultIsLeaf);
+          ensureDefault($scope.options, 'isHidden', defaultIsHidden);
 
           $scope.expandedNodes = $scope.expandedNodes || [];
           $scope.expandedNodesMap = {};
@@ -88,6 +144,9 @@
             var injectSelectionClass = "";
             if (liSelectionClass && ($scope.options.equality(this.node, $scope.selectedNode)))
               injectSelectionClass = " " + liSelectionClass;
+            if ($scope.options.isHidden(node)) {
+              injectSelectionClass = "hidden " + injectSelectionClass;
+            }
             if ($scope.options.isLeaf(node))
               return "tree-leaf" + injectSelectionClass;
             if ($scope.expandedNodesMap[this.$id])
@@ -220,6 +279,7 @@
                 _editable: false,
                 _oldName: '',
                 _isLeaf: isLeaf,
+                _isHidden: false;
                 _setEditable: function(flag) {
                   if (flag) {
                     obj._oldName = obj.name;
