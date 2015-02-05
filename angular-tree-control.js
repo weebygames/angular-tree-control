@@ -211,7 +211,7 @@
                             return s;
                         }
 
-                        scope.treeFunctions.addToTree = function(initialPath, parentNode, currentPathIndex) {
+                        var findParent = function(initialPath, parentNode, currentPathIndex) {
                             parentNode = parentNode || scope.treeModel;
                             currentPathIndex = currentPathIndex || 0;
 
@@ -222,44 +222,7 @@
                             var lastSlash = currentPath.lastIndexOf('/');
                             if (lastSlash < 0) {
                                 // Final case
-                                var obj = {
-                                    name: currentPath || initialPath,
-                                    path: initialPath,
-                                    children: [],
-                                    _editable: false,
-                                    _oldName: '',
-                                    _setEditable: function(flag) {
-                                        if (flag) {
-                                            obj._oldName = obj.name;
-                                        }
-                                        obj._editable = flag;
-                                        obj._setEditableCallback && obj._setEditableCallback();
-                                    },
-                                    _setEditableCallback: null,
-                                    _rename: function(newName) {
-                                        if (!newName || !newName.length) {
-                                            obj.name = obj._oldName;
-                                        } else {
-                                            obj.name = newName;
-
-                                            // Need to update path with new name
-                                            var lastSlash = obj.path.lastIndexOf('/');
-                                            var old_path = obj.path;
-                                            if (lastSlash >= 0) {
-                                                obj.path = obj.path.substring(0, lastSlash) + '/' + obj.name
-                                            } else {
-                                                // No slashes found, must be a top-level node.
-                                                obj.path = obj.name;
-                                            }
-
-                                            scope.nodeRenameCallback && scope.nodeRenameCallback(obj, old_path);
-                                        }
-                                        obj._setEditable(false);
-                                        return obj.name;
-                                    }
-                                };
-                                parentNode.children.push(obj);
-                                return obj;
+                                return parentNode;
                             } else {
                                 // Recursive case
                                 var firstSlash = currentPathIndex + initialPath.substring(currentPathIndex).indexOf('/');
@@ -287,6 +250,73 @@
                                     nextParent,
                                     firstSlash + 1);
                             }
+                        }
+
+                        scope.treeFunctions.deleteFromTree = function(initialPath) {
+
+                            var lastSlash = initialPath.lastIndexOf('/');
+                            var nodeName = initialPath;
+                            var prefix = '';
+                            var parent = null;
+
+                            if (lastSlash >= 0) {
+                                nodeName = initialPath.substring(lastSlash+1);
+                                prefix = initialPath.substring(0, lastSlash+1);
+                                console.log('deleting node name', nodeName);
+                                console.log('from prefix', prefix);
+                                parent = findParent(initialPath);
+                            } else {
+                                // No path, must be top-level node
+                                parent = scope.treeModel;
+                            }
+
+                            for (var i = 0; i < parent.children.length; ++i) {
+                                if(parent.children[i].name === nodeName) {
+                                    parent.children.splice(i, 1);
+                                    return;
+                                }
+                            }
+                        }
+
+                        scope.treeFunctions.addToTree = function(initialPath) {
+                            var parentNode = findParent(initialPath);
+                            var obj = {
+                                name: currentPath || initialPath,
+                                path: initialPath,
+                                children: [],
+                                _editable: false,
+                                _oldName: '',
+                                _setEditable: function(flag) {
+                                    if (flag) {
+                                        obj._oldName = obj.name;
+                                    }
+                                    obj._editable = flag;
+                                    obj._setEditableCallback && obj._setEditableCallback();
+                                },
+                                _setEditableCallback: null,
+                                _rename: function(newName) {
+                                    if (!newName || !newName.length) {
+                                        obj.name = obj._oldName;
+                                    } else {
+                                        obj.name = newName;
+
+                                        // Need to update path with new name
+                                        var lastSlash = obj.path.lastIndexOf('/');
+                                        var old_path = obj.path;
+                                        if (lastSlash >= 0) {
+                                            obj.path = obj.path.substring(0, lastSlash) + '/' + obj.name
+                                        } else {
+                                            // No slashes found, must be a top-level node.
+                                            obj.path = obj.name;
+                                        }
+
+                                        scope.nodeRenameCallback && scope.nodeRenameCallback(obj, old_path);
+                                    }
+                                    obj._setEditable(false);
+                                    return obj.name;
+                                }
+                            };
+                            parentNode.children.push(obj);
                         };
 
                         scope.$watch("treeModel", function updateNodeOnRootScope(newValue, oldValue) {
