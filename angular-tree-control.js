@@ -282,7 +282,6 @@
                                 }
                                 if (!nextParent) {
                                     var tempPath = initialPath.substring(0, firstSlash);
-                                    console.log('Next parent does not exist, adding:', tempPath, parentNode);
                                     nextParent = addNode(parentNode, tempPath, false);
                                 }
 
@@ -321,12 +320,9 @@
                             var parent = null;
 
                             if (prefix !== '') {
-                                console.log('deleting node name', nodeName);
-                                console.log('from prefix', prefix);
                                 parent = findParent(initialPath);
                             } else {
                                 // No path, must be top-level node
-                                console.log('from root, deleting node name', nodeName);
                                 parent = scope.treeModel;
                             }
 
