@@ -211,6 +211,48 @@
                             return s;
                         }
 
+                        var addNode = function(root, initialPath) {
+                            var nodeName = extractName(initialPath);
+                            var obj = {
+                                name: nodeName,
+                                path: initialPath,
+                                children: [],
+                                _editable: false,
+                                _oldName: '',
+                                _setEditable: function(flag) {
+                                    if (flag) {
+                                        obj._oldName = obj.name;
+                                    }
+                                    obj._editable = flag;
+                                    obj._setEditableCallback && obj._setEditableCallback();
+                                },
+                                _setEditableCallback: null,
+                                _rename: function(newName) {
+                                    if (!newName || !newName.length) {
+                                        obj.name = obj._oldName;
+                                    } else {
+                                        obj.name = newName;
+
+                                        // Need to update path with new name
+                                        var lastSlash = obj.path.lastIndexOf('/');
+                                        var old_path = obj.path;
+                                        if (lastSlash >= 0) {
+                                            obj.path = obj.path.substring(0, lastSlash) + '/' + obj.name
+                                        } else {
+                                            // No slashes found, must be a top-level node.
+                                            obj.path = obj.name;
+                                        }
+
+                                        scope.nodeRenameCallback && scope.nodeRenameCallback(obj, old_path);
+                                    }
+                                    obj._setEditable(false);
+                                    return obj.name;
+                                }
+                            };
+                            root.children.push(obj);
+                            return obj;
+                        }
+
                         var findParent = function(initialPath, parentNode, currentPathIndex) {
                             parentNode = parentNode || scope.treeModel;
                             currentPathIndex = currentPathIndex || 0;
@@ -238,11 +280,9 @@
                                     }
                                 }
                                 if (!nextParent) {
-                                    console.log('Next parent does not exist, adding:', initialPath.substring(0, firstSlash), parentNode);
-                                    nextParent = findParent(
-                                        initialPath.substring(0, firstSlash),
-                                        parentNode,
-                                        currentPathIndex);
+                                    var tempPath = initialPath.substring(0, firstSlash);
+                                    console.log('Next parent does not exist, adding:', tempPath, parentNode);
+                                    nextParent = addNode(parentNode, tempPath);
                                 }
 
                                 return findParent(
@@ -300,44 +340,7 @@
                         scope.treeFunctions.addToTree = function(initialPath) {
                             var parentNode = findParent(initialPath);
                             var nodeName = extractName(initialPath);
-                            var obj = {
-                                name: nodeName,
-                                path: initialPath,
-                                children: [],
-                                _editable: false,
-                                _oldName: '',
-                                _setEditable: function(flag) {
-                                    if (flag) {
-                                        obj._oldName = obj.name;
-                                    }
-                                    obj._editable = flag;
-                                    obj._setEditableCallback && obj._setEditableCallback();
-                                },
-                                _setEditableCallback: null,
-                                _rename: function(newName) {
-                                    if (!newName || !newName.length) {
-                                        obj.name = obj._oldName;
-                                    } else {
-                                        obj.name = newName;
-
-                                        // Need to update path with new name
-                                        var lastSlash = obj.path.lastIndexOf('/');
-                                        var old_path = obj.path;
-                                        if (lastSlash >= 0) {
-                                            obj.path = obj.path.substring(0, lastSlash) + '/' + obj.name
-                                        } else {
-                                            // No slashes found, must be a top-level node.
-                                            obj.path = obj.name;
-                                        }
-
-                                        scope.nodeRenameCallback && scope.nodeRenameCallback(obj, old_path);
-                                    }
-                                    obj._setEditable(false);
-                                    return obj.name;
-                                }
-                            };
-                            parentNode.children.push(obj);
-                            return obj;
+                            return addNode(parentNode, initialPath);
                         };
 
                         scope.$watch("treeModel", function updateNodeOnRootScope(newValue, oldValue) {
