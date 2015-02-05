@@ -239,13 +239,13 @@
                                 }
                                 if (!nextParent) {
                                     console.log('Next parent does not exist, adding:', initialPath.substring(0, firstSlash), parentNode);
-                                    nextParent = scope.treeFunctions.findParent(
+                                    nextParent = this.findParent(
                                         initialPath.substring(0, firstSlash),
                                         parentNode,
                                         currentPathIndex);
                                 }
 
-                                return scope.treeFunctions.findParent(
+                                return this.findParent(
                                     initialPath,
                                     nextParent,
                                     firstSlash + 1);
@@ -275,14 +275,14 @@
 
                         scope.treeFunctions.deleteFromTree = function(initialPath) {
 
-                            var nodeName = extractName(initialPath);
-                            var prefix = extractPrefix(initialPath);
+                            var nodeName = this.extractName(initialPath);
+                            var prefix = this.extractPrefix(initialPath);
                             var parent = null;
 
                             if (prefix !== '') {
                                 console.log('deleting node name', nodeName);
                                 console.log('from prefix', prefix);
-                                parent = findParent(initialPath);
+                                parent = this.findParent(initialPath);
                             } else {
                                 // No path, must be top-level node
                                 console.log('from root, deleting node name', nodeName);
@@ -298,8 +298,8 @@
                         }
 
                         scope.treeFunctions.addToTree = function(initialPath) {
-                            var parentNode = findParent(initialPath);
-                            var nodeName = extractName(initialPath);
+                            var parentNode = this.findParent(initialPath);
+                            var nodeName = this.extractName(initialPath);
                             var obj = {
                                 name: nodeName,
                                 path: initialPath,
