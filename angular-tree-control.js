@@ -239,13 +239,13 @@
                                 }
                                 if (!nextParent) {
                                     console.log('Next parent does not exist, adding:', initialPath.substring(0, firstSlash), parentNode);
-                                    nextParent = this.findParent(
+                                    nextParent = findParent(
                                         initialPath.substring(0, firstSlash),
                                         parentNode,
                                         currentPathIndex);
                                 }
 
-                                return this.findParent(
+                                return findParent(
                                     initialPath,
                                     nextParent,
                                     firstSlash + 1);
@@ -275,8 +275,8 @@
 
                         scope.treeFunctions.deleteFromTree = function(initialPath) {
 
-                            var nodeName = this.extractName(initialPath);
-                            var prefix = this.extractPrefix(initialPath);
+                            var nodeName = extractName(initialPath);
+                            var prefix = extractPrefix(initialPath);
                             var parent = null;
 
                             if (prefix !== '') {
@@ -298,8 +298,8 @@
                         }
 
                         scope.treeFunctions.addToTree = function(initialPath) {
-                            var parentNode = this.findParent(initialPath);
-                            var nodeName = this.extractName(initialPath);
+                            var parentNode = findParent(initialPath);
+                            var nodeName = extractName(initialPath);
                             var obj = {
                                 name: nodeName,
                                 path: initialPath,
