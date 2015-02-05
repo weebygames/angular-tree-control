@@ -279,7 +279,7 @@
                 _editable: false,
                 _oldName: '',
                 _isLeaf: isLeaf,
-                _isHidden: false;
+                _isHidden: false,
                 _setEditable: function(flag) {
                   if (flag) {
                     obj._oldName = obj.name;
