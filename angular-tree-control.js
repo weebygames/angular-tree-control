@@ -41,7 +41,8 @@
           filterExpression: "=?",
           filterComparator: "=?",
           contextMenuNode: "=",
-          nodeRenameCallback: "="
+          nodeRenameCallback: "=",
+          contextMenuName: '='
         },
         controller: ['$scope', function( $scope ) {
 
@@ -252,7 +253,7 @@
           var template =
             '<ul '+classIfDefined($scope.options.injectClasses.ul, true)+'>' +
               '<li context-menu="contextMenuShow(node)" '
-                + 'data-target="menu-test" '
+                + 'data-target="explorer-context-menu" '
                 + 'ng-repeat="node in node.' + $scope.options.nodeChildren
                 + ' | filter:filterExpression:filterComparator'
                 + ' | orderBy:orderBy:reverseOrder" '
@@ -470,10 +471,6 @@
               });
               scope.expandedNodesMap = newExpandedNodesMap;
             });
-
-//                        scope.$watch('expandedNodesMap', function(newValue) {
-//
-//                        });
 
             //Rendering template for a root node
             treemodelCntr.template( scope, function(clone) {
