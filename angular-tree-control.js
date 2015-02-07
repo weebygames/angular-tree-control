@@ -212,6 +212,7 @@
                 // If they're selecting the already-selected node, pop open
                 // the context menu.
                 if (selectedNode.contextMenuFunctions) {
+                  $scope.contextMenuShow(selectedNode);
                   selectedNode.contextMenuFunctions.openOn($event.target);
                   $event.preventDefault();
                   $event.stopPropagation();
