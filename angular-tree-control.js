@@ -44,7 +44,9 @@
           nodeRenameCallback: "=",
           contextMenuName: '='
         },
-        controller: ['$scope', function( $scope ) {
+        controller: ['$scope', '$element', function( $scope, $element ) {
+
+          $scope.myMenuFunctions = {};
 
           // Hides all nodes who don't have 'qry' in their names
           // (or in one of their children)
@@ -196,7 +198,7 @@
               $scope.onNodeToggle({node: this.node, expanded: expanding});
           };
 
-          $scope.selectNodeLabel = function( selectedNode ){
+          $scope.selectNodeLabel = function( selectedNode, $event ){
             if (selectedNode[$scope.options.nodeChildren] && selectedNode[$scope.options.nodeChildren].length > 0 &&
               !$scope.options.dirSelectable) {
               this.selectNodeHead();
@@ -206,10 +208,21 @@
                 $scope.selectedNode = selectedNode;
               }
               else {
-                $scope.selectedNode = undefined;
+                // $scope.selectedNode = undefined;
+                // If they're selecting the already-selected node, pop open
+                // the context menu.
+                if (selectedNode.contextMenuFunctions) {
+                  selectedNode.contextMenuFunctions.openOn($event.target);
+                  $event.preventDefault();
+                  $event.stopPropagation();
+                }
+                else {
+                  console.warn('contextMenuFunctions not set up correctly');
+                }
               }
-              if ($scope.onSelection)
+              if ($scope.onSelection) {
                 $scope.onSelection({node: $scope.selectedNode});
+              }
             }
           };
 
@@ -258,11 +271,12 @@
                 + ' | filter:filterExpression:filterComparator'
                 + ' | orderBy:orderBy:reverseOrder" '
                 + 'ng-class="headClass(node)" '
-                + classIfDefined($scope.options.injectClasses.li, true)
+                + classIfDefined($scope.options.injectClasses.li, true) + ' '
+                + 'context-menu-tree-node="node" '
                 +'>' +
                 '<i class="tree-branch-head" ng-class="iBranchClass()" ng-click="!node._editable && selectNodeHead(node)"></i>' +
                 '<i class="tree-leaf-head '+classIfDefined($scope.options.injectClasses.iLeaf, false)+'"></i>' +
-                '<div class="tree-label '+classIfDefined($scope.options.injectClasses.label, false)+'" ng-class="selectedClass()" ng-click="!node._editable && selectNodeLabel(node)" tree-transclude></div>' +
+                '<div class="tree-label '+classIfDefined($scope.options.injectClasses.label, false)+'" ng-class="selectedClass()" ng-click="!node._editable && selectNodeLabel(node, $event)" tree-transclude></div>' +
                 '<treeitem ng-if="nodeExpanded()"></treeitem>' +
               '</li>' +
             '</ul>';
@@ -272,9 +286,6 @@
         compile: function(element, attrs, childTranscludeFn) {
           // return linking function
           return function ( scope, element, attrs, treemodelCntr ) {
-
-            scope.treeFunctions = scope.treeFunctions || {};
-            // debugger
 
             var trimSlashes = function(s) {
               var i;
