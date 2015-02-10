@@ -254,6 +254,10 @@
             return false;
           };
 
+          $scope.treeFunctions.clearSelected = function() {
+            $scope.selectedNode = undefined;
+          };
+
           $scope.selectedClass = function() {
             var labelSelectionClass = classIfDefined($scope.options.injectClasses.labelSelected, false);
             var injectSelectionClass = "";
