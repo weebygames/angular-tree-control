@@ -301,7 +301,7 @@
                 s = s.substring(0, i);
               }
               return s;
-            }
+            };
 
             var addNode = function(root, initialPath, isLeaf) {
               var nodeName = extractName(initialPath);
@@ -345,15 +345,20 @@
               };
               root.children.push(obj);
               return obj;
-            }
+            };
 
-            var findParent = function(initialPath, parentNode, currentPathIndex) {
+            var findParent =
+              function(
+                initialPath,
+                parentNode,
+                currentPathIndex) {
               parentNode = parentNode || scope.treeModel;
               currentPathIndex = currentPathIndex || 0;
 
               initialPath = trimSlashes(initialPath);
 
-              var currentPath = initialPath.substring(currentPathIndex, initialPath.length);
+              var currentPath = initialPath.substring(currentPathIndex,
+                initialPath.length);
               currentPath = currentPath;
               var lastSlash = currentPath.lastIndexOf('/');
               if (lastSlash < 0) {
@@ -361,8 +366,10 @@
                 return parentNode;
               } else {
                 // Recursive case
-                var firstSlash = currentPathIndex + initialPath.substring(currentPathIndex).indexOf('/');
-                var nextParentName = initialPath.substring(currentPathIndex, firstSlash);
+                var firstSlash = currentPathIndex
+                  + initialPath.substring(currentPathIndex).indexOf('/');
+                var nextParentName = initialPath.substring(currentPathIndex,
+                  firstSlash);
 
                 // Make sure the next directory down exists
                 var nextParent = null;
@@ -383,7 +390,7 @@
                   nextParent,
                   firstSlash + 1);
               }
-            }
+            };
 
             var extractName = function(initialPath) {
               var lastSlash = initialPath.lastIndexOf('/');
@@ -394,7 +401,7 @@
               }
 
               return nodeName;
-            }
+            };
 
             var extractPrefix = function(initialPath) {
               var lastSlash = initialPath.lastIndexOf('/');
@@ -404,7 +411,7 @@
                 prefix = initialPath.substring(0, lastSlash+1);
               }
               return prefix;
-            }
+            };
 
             scope.treeFunctions.deleteFromTree = function(initialPath) {
 
@@ -425,7 +432,7 @@
                   return;
                 }
               }
-            }
+            };
 
             scope.treeFunctions.addToTree = function(initialPath, isLeaf) {
               var parentNode = findParent(initialPath);
@@ -444,10 +451,14 @@
               return addNode(parentNode, initialPath, isLeaf);
             };
 
-            scope.$watch("treeModel", function updateNodeOnRootScope(newValue, oldValue) {
+            scope.$watch("treeModel",
+              function updateNodeOnRootScope(newValue, oldValue) {
               if (angular.isArray(newValue)) {
-                if (angular.isDefined(scope.node) && angular.equals(scope.node[scope.options.nodeChildren], newValue))
+                if (angular.isDefined(scope.node)
+                  && angular.equals(scope.node[scope.options.nodeChildren],
+                    newValue)) {
                   return;
+                }
                 scope.node = {};
                 scope.synteticRoot = scope.node;
                 scope.node[scope.options.nodeChildren] = newValue;
@@ -464,15 +475,18 @@
               var newExpandedNodesMap = {};
               var $liElements = element.find('li');
               var existingScopes = [];
-              // find all nodes visible on the tree and the scope $id of the scopes including them
+              // find all nodes visible on the tree and the scope $id of the
+              // scopes including them
               angular.forEach($liElements, function(liElement) {
                 var $liElement = angular.element(liElement);
                 var liScope = $liElement.scope();
                 existingScopes.push(liScope);
               });
-              // iterate over the newValue, the new expanded nodes, and for each find it in the existingNodesAndScopes
+              // iterate over the newValue, the new expanded nodes, and for each
+              // find it in the existingNodesAndScopes
               // if found, add the mapping $id -> node into newExpandedNodesMap
-              // if not found, add the mapping num -> node into newExpandedNodesMap
+              // if not found, add the mapping num -> node into
+              // newExpandedNodesMap
               angular.forEach(newValue, function(newExNode) {
                 var found = false;
                 for (var i=0; (i < existingScopes.length) && !found; i++) {
@@ -492,8 +506,10 @@
             treemodelCntr.template( scope, function(clone) {
               element.html('').append( clone );
             });
-            // save the transclude function from compile (which is not bound to a scope as apposed to the one from link)
-            // we can fix this to work with the link transclude function with angular 1.2.6. as for angular 1.2.0 we need
+            // save the transclude function from compile (which is not bound to
+            // a scope as apposed to the one from link)
+            // we can fix this to work with the link transclude function with
+            // angular 1.2.6. as for angular 1.2.0 we need
             // to keep using the compile function
             scope.$treeTransclude = childTranscludeFn;
           }
@@ -527,10 +543,14 @@
             scope.selectedNode = scope.node;
           }
 
-          // create a scope for the transclusion, whos parent is the parent of the tree control
+          // create a scope for the transclusion, whos parent is the parent of
+          // the tree control
           scope.transcludeScope = scope.parentScopeOfTree.$new();
           scope.transcludeScope.node = scope.node;
-          scope.transcludeScope.$parentNode = (scope.$parent.node === scope.synteticRoot)?null:scope.$parent.node;
+          scope.transcludeScope.$parentNode =
+            (scope.$parent.node === scope.synteticRoot)
+              ? null
+              : scope.$parent.node;
           scope.transcludeScope.$index = scope.$index;
           scope.transcludeScope.$first = scope.$first;
           scope.transcludeScope.$middle = scope.$middle;
@@ -560,17 +580,21 @@
         var target = element[0];
 
         node._setEditableCallback = function() {
-        $timeout(function(){ target.focus(); });
+          $timeout(function(){ target.focus(); });
         };
 
         var doRename = function(useNewValue) {
-        scope.$apply(function (){
-          target.innerHTML = scope.ngModel._rename(useNewValue ? target.innerHTML : undefined);
-        });
+          scope.$apply(function (){
+            target.innerHTML = scope.ngModel._rename(useNewValue
+              ? target.innerHTML
+              : undefined);
+          });
         };
 
         element.bind('blur', function() {
-        doRename(true);
+          if (node._editable) {
+            doRename(true);
+          }
         });
 
         element.bind("keydown keypress", function (event) {
