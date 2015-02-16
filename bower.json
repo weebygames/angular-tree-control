@@ -3,7 +3,8 @@
   "version": "0.2.7",
   "main": [
     "./angular-tree-control.js",
-    "./css/tree-control.css"
+    "./css/tree-control.css",
+    "./images/*.png"
   ],
   "ignore": [
     "Gruntfile.js",
