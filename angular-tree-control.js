@@ -40,11 +40,13 @@
           reverseOrder: "@",
           filterExpression: "=?",
           filterComparator: "=?",
-          contextMenuNode: "=",
           nodeRenameCallback: "=",
-          contextMenuName: '='
+
+          contextMenuNode: "=",
+          contextMenuName: '=',
+          isLumxDropdown: '&'
         },
-        controller: ['$scope', '$element', function( $scope, $element ) {
+        controller: ['$scope', '$attrs', '$element', function( $scope, $attrs, $element ) {
 
           $scope.myMenuFunctions = {};
 
@@ -267,10 +269,11 @@
             return (this.node == $scope.selectedNode)?"tree-selected" + injectSelectionClass:"";
           };
 
+          var isLumxDropdown = $attrs.isLumxDropdown === 'true';
           //tree template
           var template =
             '<ul '+classIfDefined($scope.options.injectClasses.ul, true)+'>' +
-              '<li context-menu="contextMenuShow(node)" '
+              '<li context-menu="contextMenuShow(node)" is-lumx-dropdown="' + isLumxDropdown + '"'
                 + 'data-target="explorer-context-menu" '
                 + 'ng-repeat="node in node.' + $scope.options.nodeChildren
                 + ' | filter:filterExpression:filterComparator'
