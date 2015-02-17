@@ -210,11 +210,12 @@
                 $scope.selectedNode = selectedNode;
               }
               else {
-                // $scope.selectedNode = undefined;
                 // If they're selecting the already-selected node, pop open
                 // the context menu.
+                $event.preventDefault();
+                $event.stopPropagation();
+                $scope.contextMenuShow(selectedNode);
                 if (selectedNode.contextMenuFunctions) {
-                  $scope.contextMenuShow(selectedNode);
                   selectedNode.contextMenuFunctions.openOn($event.target);
                   $event.preventDefault();
                   $event.stopPropagation();
