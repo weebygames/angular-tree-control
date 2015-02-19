@@ -442,6 +442,7 @@
               var parentNode = findParent(initialPath);
               var nodeName = extractName(initialPath);
 
+              // Make sure new node is expanded
               var found = false;
               for (var i = 0; i < scope.expandedNodes.length; ++i) {
                 if (scope.expandedNodes[i] === parentNode) {
@@ -452,6 +453,16 @@
                 scope.expandedNodes.push(parentNode);
               }
 
+              // Check for duplicates
+              if (parentNode && parentNode.children) {
+                for (var i = 0; i < parentNode.children.length; ++i) {
+                  var testNode = parentNode.children[i];
+                  if (testNode.path === initialPath) {
+                    // found duplicate, return
+                    return testNode;
+                  }
+                }
+              }
               return addNode(parentNode, initialPath, isLeaf);
             };
 
