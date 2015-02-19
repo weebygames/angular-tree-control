@@ -275,7 +275,7 @@
           var template =
             '<ul '+classIfDefined($scope.options.injectClasses.ul, true)+'>' +
               '<li context-menu="contextMenuShow(node)" is-lumx-dropdown="' + isLumxDropdown + '"'
-                + 'data-target="explorer-context-menu" '
+                + 'data-target="' + $attrs.contextMenuName + '" '
                 + 'ng-repeat="node in node.' + $scope.options.nodeChildren
                 + ' | filter:filterExpression:filterComparator'
                 + ' | orderBy:orderBy:reverseOrder" '
