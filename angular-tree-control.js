@@ -447,6 +447,7 @@
               for (var i = 0; i < scope.expandedNodes.length; ++i) {
                 if (scope.expandedNodes[i] === parentNode) {
                   found = true;
+                  break;
                 }
               }
               if (!found) {
@@ -464,6 +465,15 @@
                 }
               }
               return addNode(parentNode, initialPath, isLeaf);
+            };
+
+            scope.treeFunctions.clearTree = function() {
+              scope.selectedNode = undefined;
+              scope.expandedNodes = [];
+              scope.treeModel = {
+                name: '',
+                children: []
+              };
             };
 
             scope.$watch("treeModel",
