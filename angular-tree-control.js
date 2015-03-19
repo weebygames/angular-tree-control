@@ -109,8 +109,8 @@
           }
 
           $scope.contextMenuShow = function(node) {
-            console.info('showing context menu on ', node);
-            $scope.contextMenuNode = node;
+            // console.info('showing context menu on ', node);
+            // $scope.contextMenuNode = node;
           };
 
           $scope.options = $scope.options || {};
@@ -218,7 +218,6 @@
 
               if ($scope.onSelection) {
                 $scope.onSelection({node: $scope.selectedNode});
-                console.info('selected with left-click', selectedNode);
               }
               return;
             }
@@ -229,15 +228,15 @@
             // $event.preventDefault();
             // $event.stopPropagation();
             // $scope.contextMenuShow(selectedNode);
-            if (selectedNode.contextMenuFunctions) {
-              selectedNode.contextMenuFunctions.openOn($event.target);
-              $event.preventDefault();
-              $event.stopPropagation();
-              console.info('context menu with double-left on', selectedNode);
-            }
-            else {
-              console.warn('contextMenuFunctions not set up correctly');
-            }
+            // if (selectedNode.contextMenuFunctions) {
+            //   selectedNode.contextMenuFunctions.openOn($event.target);
+            //   $event.preventDefault();
+            //   $event.stopPropagation();
+            //   console.info('context menu with double-left on', selectedNode);
+            // }
+            // else {
+            //   console.warn('contextMenuFunctions not set up correctly');
+            // }
           };
 
           // Scan down tree and make sure that everything is expanded
@@ -284,14 +283,14 @@
           //tree template
           var template =
             '<ul '+classIfDefined($scope.options.injectClasses.ul, true)+'>' +
-              '<li context-menu="contextMenuShow(node)" is-lumx-dropdown="' + isLumxDropdown + '"'
+              '<li ' // context-menu="contextMenuShow(node)" is-lumx-dropdown="' + isLumxDropdown + '"'
+                // + 'context-menu-tree-node="node" '
                 + 'data-target="' + $attrs.contextMenuName + '" '
                 + 'ng-repeat="node in node.' + $scope.options.nodeChildren
                 + ' | filter:filterExpression:filterComparator'
                 + ' | orderBy:orderBy:reverseOrder" '
                 + 'ng-class="headClass(node)" '
                 + classIfDefined($scope.options.injectClasses.li, true) + ' '
-                + 'context-menu-tree-node="node" '
                 +'>' +
                 '<i class="tree-branch-head" ng-class="iBranchClass()" ng-click="!node._editable && selectNodeHead(node)"></i>' +
                 '<i class="tree-leaf-head '+classIfDefined($scope.options.injectClasses.iLeaf, false)+'"></i>' +
