@@ -109,6 +109,7 @@
           }
 
           $scope.contextMenuShow = function(node) {
+            console.info('showing context menu on ', node);
             $scope.contextMenuNode = node;
           };
 
@@ -201,32 +202,41 @@
           };
 
           $scope.selectNodeLabel = function( selectedNode, $event ){
-            if (selectedNode[$scope.options.nodeChildren] && selectedNode[$scope.options.nodeChildren].length > 0 &&
-              !$scope.options.dirSelectable) {
+
+            var hasChildrenAndIsSelectable =
+              selectedNode[$scope.options.nodeChildren] &&
+              selectedNode[$scope.options.nodeChildren].length > 0 &&
+              !$scope.options.dirSelectable;
+
+            if (hasChildrenAndIsSelectable) {
               this.selectNodeHead();
+              return;
             }
-            else {
-              if ($scope.selectedNode != selectedNode) {
-                $scope.selectedNode = selectedNode;
-              }
-              else {
-                // If they're selecting the already-selected node, pop open
-                // the context menu.
-                $event.preventDefault();
-                $event.stopPropagation();
-                $scope.contextMenuShow(selectedNode);
-                if (selectedNode.contextMenuFunctions) {
-                  selectedNode.contextMenuFunctions.openOn($event.target);
-                  $event.preventDefault();
-                  $event.stopPropagation();
-                }
-                else {
-                  console.warn('contextMenuFunctions not set up correctly');
-                }
-              }
+
+            if ($scope.selectedNode != selectedNode) {
+              $scope.selectedNode = selectedNode;
+
               if ($scope.onSelection) {
                 $scope.onSelection({node: $scope.selectedNode});
+                console.info('selected with left-click', selectedNode);
               }
+              return;
+            }
+
+            // If they're selecting the already-selected node, pop open
+            // the context menu.
+            // console.info('double-selection, opening context menu');
+            // $event.preventDefault();
+            // $event.stopPropagation();
+            // $scope.contextMenuShow(selectedNode);
+            if (selectedNode.contextMenuFunctions) {
+              selectedNode.contextMenuFunctions.openOn($event.target);
+              $event.preventDefault();
+              $event.stopPropagation();
+              console.info('context menu with double-left on', selectedNode);
+            }
+            else {
+              console.warn('contextMenuFunctions not set up correctly');
             }
           };
 
