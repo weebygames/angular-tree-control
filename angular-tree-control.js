@@ -109,8 +109,7 @@
           }
 
           $scope.contextMenuShow = function(node) {
-            // console.info('showing context menu on ', node);
-            // $scope.contextMenuNode = node;
+            $scope.contextMenuNode = node;
           };
 
           $scope.options = $scope.options || {};
@@ -224,19 +223,17 @@
 
             // If they're selecting the already-selected node, pop open
             // the context menu.
-            // console.info('double-selection, opening context menu');
-            // $event.preventDefault();
-            // $event.stopPropagation();
-            // $scope.contextMenuShow(selectedNode);
-            // if (selectedNode.contextMenuFunctions) {
-            //   selectedNode.contextMenuFunctions.openOn($event.target);
-            //   $event.preventDefault();
-            //   $event.stopPropagation();
-            //   console.info('context menu with double-left on', selectedNode);
-            // }
-            // else {
-            //   console.warn('contextMenuFunctions not set up correctly');
-            // }
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.contextMenuShow(selectedNode);
+            if (selectedNode.contextMenuFunctions) {
+              selectedNode.contextMenuFunctions.openOn($event.target);
+              $event.preventDefault();
+              $event.stopPropagation();
+            }
+            else {
+              console.warn('contextMenuFunctions not set up correctly');
+            }
           };
 
           // Scan down tree and make sure that everything is expanded
@@ -283,8 +280,8 @@
           //tree template
           var template =
             '<ul '+classIfDefined($scope.options.injectClasses.ul, true)+'>' +
-              '<li ' // context-menu="contextMenuShow(node)" is-lumx-dropdown="' + isLumxDropdown + '"'
-                // + 'context-menu-tree-node="node" '
+              '<li context-menu="contextMenuShow(node)" is-lumx-dropdown="' + isLumxDropdown + '"'
+                + 'context-menu-tree-node="node" '
                 + 'data-target="' + $attrs.contextMenuName + '" '
                 + 'ng-repeat="node in node.' + $scope.options.nodeChildren
                 + ' | filter:filterExpression:filterComparator'
