@@ -601,47 +601,51 @@
     })
     .directive('editableTreeNode', function ($timeout) {
       return {
-      restrict: 'E',
-      scope: {
-        ngModel: '='
-      },
-      link: function (scope, element, attrs) {
-        // Add callbacks to the node
-        var node = scope.ngModel;
-        var target = element[0];
+        restrict: 'E',
+        scope: {
+          ngModel: '='
+        },
+        template:
+          '<input ng-show="!!ngModel._editable" type="text" ng-model="ngModel.name">' +
+          '<span ng-show="!!!ngModel._editable">{{ngModel.name}}</span>',
+        link: function (scope, element, attrs) {
+          // Add callbacks to the node
+          var node = scope.ngModel;
+          var target = element.children('input');
 
-        node._setEditableCallback = function() {
-          $timeout(function(){ target.focus(); });
-        };
+          node._setEditableCallback = function() {
+            $timeout(function(){ target.focus(); });
+          };
 
-        var doRename = function(useNewValue) {
-          scope.$apply(function (){
-            target.innerHTML = scope.ngModel._rename(useNewValue
-              ? target.innerHTML
-              : undefined);
+          var doRename = function(useNewValue) {
+            scope.$apply(function (){
+              var foo = scope.ngModel._rename(useNewValue
+                ? scope.ngModel.name
+                : undefined);
+              console.info('foo: ', foo);
+            });
+          };
+
+          target.on('blur', function() {
+            if (node._editable) {
+              doRename(true);
+            }
           });
-        };
 
-        element.bind('blur', function() {
-          if (node._editable) {
-            doRename(true);
-          }
-        });
+          target.on("keydown keypress", function (event) {
+            if(event.which === 13) {
+              doRename(true);
+              event.preventDefault();
+            }
+          });
 
-        element.bind("keydown keypress", function (event) {
-        if(event.which === 13) {
-          doRename(true);
-          event.preventDefault();
+          target.on("keydown keypress", function (event) {
+            if(event.which === 27) {
+              doRename(false);
+              event.preventDefault();
+            }
+          });
         }
-        });
-
-        element.bind("keydown keypress", function (event) {
-        if(event.which === 27) {
-          doRename(false);
-          event.preventDefault();
-        }
-        });
-      }
       }
     });
 })( angular );
