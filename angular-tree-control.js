@@ -619,10 +619,9 @@
 
           var doRename = function(useNewValue) {
             scope.$apply(function (){
-              var foo = scope.ngModel._rename(useNewValue
+              scope.ngModel._rename(useNewValue
                 ? scope.ngModel.name
                 : undefined);
-              console.info('foo: ', foo);
             });
           };
 
