@@ -603,14 +603,14 @@
       return {
         restrict: 'E',
         scope: {
-          ngModel: '='
+          model: '='
         },
         template:
-          '<input ng-show="!!ngModel._editable" type="text" ng-model="ngModel.name">' +
-          '<span ng-show="!!!ngModel._editable">{{ngModel.name}}</span>',
+          '<input ng-show="!!model._editable" type="text" ng-model="model.name">' +
+          '<span ng-show="!!!model._editable">{{model.name}}</span>',
         link: function (scope, element, attrs) {
           // Add callbacks to the node
-          var node = scope.ngModel;
+          var node = scope.model;
           var target = element.children('input');
 
           node._setEditableCallback = function() {
@@ -619,8 +619,8 @@
 
           var doRename = function(useNewValue) {
             scope.$apply(function (){
-              scope.ngModel._rename(useNewValue
-                ? scope.ngModel.name
+              scope.model._rename(useNewValue
+                ? scope.model.name
                 : undefined);
             });
           };
