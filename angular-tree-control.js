@@ -599,7 +599,7 @@
         }
       }
     })
-    .directive('editableTreeNode', function ($timeout) {
+    .directive('editableTreeNode', ['$timeout', function ($timeout) {
       return {
         restrict: 'E',
         scope: {
@@ -646,5 +646,5 @@
           });
         }
       }
-    });
+    }]);
 })( angular );
